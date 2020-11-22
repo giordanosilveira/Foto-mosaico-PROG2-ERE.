@@ -1,0 +1,2 @@
+# Foto-mosaico-PROG2-ERE.
+HAHAHAHAAHAHAHAHAHAHHAHAHAHHA, Não é sacanagem
