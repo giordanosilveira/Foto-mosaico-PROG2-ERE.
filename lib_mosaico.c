@@ -1,3 +1,4 @@
+/*Giordano Henrique Silveira. GRR:20197154*/
 #include "lib_mosaico.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -152,7 +153,6 @@ void readPas (char *fname, t_tiles *past) {
         fprintf (stderr, "Não foi possível ler o tipo da imagem\n");
         exit (1);
     }
-    //printf ("%s\n", past->vetor[past->size].tipo);
 
     //tratando os comentários
     anlzndo_coments (file);
@@ -162,7 +162,6 @@ void readPas (char *fname, t_tiles *past) {
         fprintf (stderr, "Números de argumentos inválidos\n");
         exit (1);
     }
-    //printf ("%d %d\n", past->vetor[past->size].largura, past->vetor[past->size].altura);
 
     //tratando os comentários
     anlzndo_coments (file);
@@ -172,7 +171,6 @@ void readPas (char *fname, t_tiles *past) {
         fprintf (stderr, "Números de argumentos inválidos\n");
         exit(1);
     }
-    //printf ("%d\n", past->vetor[past->size].rgb);
 
     //Checando para ver se o componente RGB é válido
     if (past->vetor[past->size].rgb != COMP_RGB) {
@@ -239,7 +237,8 @@ t_pixel* crmdia_bloco (int crel, int lrel, int largura, int altura, t_pixel ** m
     t_pixel *media;
 
     media = malloc(sizeof(t_pixel));
-    //printf ("print dos pixeis\n");
+    //Bloco anda pelo bloco e calcula a media dos pixels
+    //Somatorio dos pixels/quantidade de pixels
     for (int i = lrel; i < altura + lrel; i++) {
         for (int j = crel; j < largura + crel; j++) {
             red = mt_pixel[i][j].red;
@@ -251,10 +250,9 @@ t_pixel* crmdia_bloco (int crel, int lrel, int largura, int altura, t_pixel ** m
             mblue = mblue + blue;
         }
     }
-
     media->red = mred/(altura*largura);
     media->green = mgreen/(altura*largura);
-    media->blue = mblue/(altura*largura);
+    media->blue = mblue/(altura*largura);               //Fim do bloco
 
     return media;
 }
@@ -351,14 +349,16 @@ float calculaCMP (t_pixel *mediaPas, t_pixel * mediaBloco) {
     float green1, green2;
     float blue1, blue2;
 
+    //char -> float 
     red1 = mediaBloco->red; red2 = mediaPas->red;
     green1 = mediaBloco->green; green2 = mediaPas->green;
     blue1 = mediaBloco->blue; blue2 = mediaPas->blue; 
 
+    //Bloco: quela conta da proximidade de duas cores
     mred = (red1 + red2)/2;
     deltaC = sqrt((2 + mred/COMP_RGBM1)*pow(red2-red1,2)+4*pow(green2-green1,2)+(2 + (COMP_RGB - mred)/COMP_RGBM1)*pow(blue2-blue1,2));
     if (deltaC < 0)
-        deltaC = deltaC * (-1);
+        deltaC = deltaC * (-1);                             //Fim do bloco
 
     return deltaC;
 }
@@ -367,16 +367,20 @@ void cormaisProx (t_tiles *pastilhas, t_imagem *mosaico, t_pixel *media, int col
     int indmenor = 0;
     float deltaC, retrn;
 
+    //Inicializando a variavel deltaC com a primeira pastilha
     deltaC = calculaCMP (pastilhas->vetor[0].m_pixels, media);
 
+    //Bloco: Calcula o deltaC de todas as pastilhas e pega o menos
     for (int i = 1; i < pastilhas->size; i++) {
         retrn = calculaCMP (pastilhas->vetor[i].m_pixels, media); 
         if (retrn < deltaC) {
             deltaC = retrn;
             indmenor = i;
         }
-    }
+    }                                                       //Fim do bloco
 
+    //Bloco: achado o menor deltaC, vai no vetor de pastilhas, pega essa pastilha
+    //e copia na matriz de pixel do mosaico
     int i = 0;
     for (int linha = linharel; linha < altB + linharel; linha++) {
         int j = 0;
@@ -387,25 +391,28 @@ void cormaisProx (t_tiles *pastilhas, t_imagem *mosaico, t_pixel *media, int col
             j++;
         }
         i++;
-    }
+    }                                                      //Fim do bloco
 }
 void writeImg (char *nomeimg, t_imagem *mosaico, char * tipoP) {
 
     FILE * file;
-    
+
+    //Bloco: abre o arquivo com o nome desejado   
     file = fopen (nomeimg, "w");
     if (!file) {
         fprintf (stderr, "Não foi possível abrir o arquivo\n");
         exit (1);
-    }
+    }                                                      //Fim do bloco
 
+    //Bloco: cabeçalho da função
     fprintf (file, "%s\n", mosaico->tipo);
 
     fprintf (file, "# Autor: Giordano Henrique Silveira\n");
     fprintf (file, "# Não copia comédia\n");
 
-    fprintf (file, "%d %d\n", mosaico->largura, mosaico->altura);
+    fprintf (file, "%d %d\n", mosaico->largura, mosaico->altura);//Fim do bloco
 
+    //Se a imagem for p6 printa como raw
     if (strcmp(mosaico->tipo, "P6") == 0){
         if (strcmp(tipoP, "P3")==0){
             fprintf (file, "%d\n  ", COMP_RGB);
@@ -416,6 +423,7 @@ void writeImg (char *nomeimg, t_imagem *mosaico, char * tipoP) {
             fwrite (mosaico->dado[0], 3 * mosaico->largura, mosaico->altura, file);
         }
     }
+    //Senão printa como ascii
     else{
         fprintf (file, "%d\n", COMP_RGB);
         for (int i = 0; i < mosaico->altura; i++){

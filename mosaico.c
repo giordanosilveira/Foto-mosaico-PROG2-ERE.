@@ -1,3 +1,5 @@
+/*Giordano Henrique Silveira. GRR:20197154*/
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<sys/types.h>
@@ -78,6 +80,8 @@ int main (int argc, char *argv[]) {
 	//Calculando a cor média de cada bloco de pastilha
 	for (int i = 0; i < pastilhas->size; i++) 
 		pastilhas->vetor[i].m_pixels = crmdia_bloco (0,0,pastilhas->vetor[i].largura, pastilhas->vetor[i].altura, pastilhas->vetor[i].dado);
+
+	//tamanho das pastihas
 	larB = pastilhas->vetor[0].largura;
 	altB = pastilhas->vetor[0].altura;
 
@@ -90,31 +94,34 @@ int main (int argc, char *argv[]) {
 	mosaico = initImagem (1);		
 	copiaDados (mosaico,foto);		
 	mosaico->dado = allctMat_p (mosaico->largura, mosaico->altura);			//fim do bloco
-														
+
+	//Bloco: aqui ele cuida da media dos bloquinhos da imagem grande
+	//Contas facilmente explicaveis													
 	for (int linharel = 0; linharel < foto->altura; linharel += altB) {
 		for (int colunarel = 0; colunarel < foto->largura; colunarel += larB) {
-			if ((linharel + altB > foto->altura) && (colunarel + larB > foto->largura)){
+			if ((linharel + altB > foto->altura) && (colunarel + larB > foto->largura)){		//Verificação do ultimo pixel caso necessário
 				foto->m_pixels = crmdia_bloco (colunarel, linharel, foto->largura - colunarel, foto->altura - linharel, foto->dado);
 				cormaisProx (pastilhas,mosaico,foto->m_pixels,colunarel,linharel,foto->largura - colunarel,foto->altura - linharel);
 			}
-			else if (linharel + altB > foto->altura){
-				foto->m_pixels = crmdia_bloco (colunarel, linharel, larB, foto->altura - linharel, foto->dado);
+			else if (linharel + altB > foto->altura){											//Verificação do tamanho da altura da imagem
+				foto->m_pixels = crmdia_bloco (colunarel, linharel, larB, foto->altura - linharel, foto->dado);//Conta para calcular certinho o bloco da imagem grande, quando cortada em relação a altura
 				cormaisProx (pastilhas,mosaico,foto->m_pixels,colunarel,linharel,larB,foto->altura - linharel);
 			}
-			else if (colunarel + larB > foto->largura){
-				foto->m_pixels = crmdia_bloco (colunarel, linharel, foto->largura - colunarel, altB, foto->dado);
+			else if (colunarel + larB > foto->largura){											//Verificação do tamanho da largura da imagem
+				foto->m_pixels = crmdia_bloco (colunarel, linharel, foto->largura - colunarel, altB, foto->dado);//Conta para calcular certinho o bloco da imagem grande, quando cortada em relação a largura
 				cormaisProx (pastilhas,mosaico,foto->m_pixels,colunarel,linharel,foto->largura - colunarel,altB);
 			}
-			else {
+			else {																				//Condição normal
 				foto->m_pixels = crmdia_bloco (colunarel, linharel, larB, altB, foto->dado);
 				cormaisProx (pastilhas,mosaico,foto->m_pixels,colunarel,linharel,larB,altB);
 			}
-		}
+		}																	//Fim do bloco
 	}
 
 	writeImg (nomemosaico, mosaico, pastilhas->vetor[0].tipo);
 
-	//desalocaPas (pastilhas);
+	//Desaloca as estruturas usada
+	desalocaPas (pastilhas);
 	desalocaImg (foto);
 	desalocaImg (mosaico);
 

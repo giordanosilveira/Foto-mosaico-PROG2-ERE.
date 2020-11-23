@@ -1,5 +1,5 @@
 //Biblioteca do programa mosaico.c
-//Giordano Henrique Silveira
+/*Giordano Henrique Silveira. GRR:20197154*/
 
 #ifndef __LBM__
 #define __LBM__
@@ -22,7 +22,7 @@ typedef struct {
 //Essa struct contem o tamanho da imagem, a matrix de pixel, o tipo da imagem
 //e a cor média dos pixels;
 typedef struct {
-    t_pixel *m_pixels;
+    t_pixel *m_pixels;				//Media do bloco
 	t_pixel **dado;
 	char tipo[MAX_TYPE + 1];
 	int largura, altura, rgb;
